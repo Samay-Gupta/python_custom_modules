@@ -11,3 +11,17 @@ elif [ -f "$HOME/.bashrc" ]; then
 else
     echo "No .bashrc or .zshrc found. Please manually update your shell configuration."
 fi
+
+if [ -d "$DIR_TO_ADD" ]; then
+    cd "$DIR_TO_ADD"
+    cd "storage"
+    
+    if [ -f "models.zip" ]; then
+        unzip models.zip
+        echo "Unzipped models.zip in $DIR_TO_ADD"
+    else
+        echo "models.zip not found in $DIR_TO_ADD"
+    fi
+else
+    echo "$DIR_TO_ADD does not exist."
+fi
