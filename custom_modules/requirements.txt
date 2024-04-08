@@ -11,3 +11,8 @@ scikit-learn
 imutils
 
 youtube-dl
+
+pydub
+SpeechRecognition
+soundfile
+openai-whisper
