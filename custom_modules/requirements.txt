@@ -9,3 +9,5 @@ python-barcode
 
 scikit-learn
 imutils
+
+youtube-dl

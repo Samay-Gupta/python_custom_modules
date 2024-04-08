@@ -53,3 +53,26 @@ def create_cv_shortcut(envname: str='venv'):
 
     print(f"Alias 'cv' created. Please restart the terminal or source the profile file.")
 
+def create_yt_shortcut(envname: str='venv'):
+    shell = os.environ.get('SHELL', '')
+    if 'bash' in shell:
+        profile_file = os.path.expanduser('~/.bashrc')
+    elif 'zsh' in shell:
+        profile_file = os.path.expanduser('~/.zshrc')
+    else:
+        print("Unsupported shell. Manual alias setup required.")
+        return
+    base_dir = get_base_dir()
+    envpath = os.path.join(base_dir, envname)
+    subprocess.check_call([sys.executable, '-m', 'venv', envpath])
+    pip_executable = os.path.join(envpath, 'bin', 'pip')
+    subprocess.check_call([pip_executable, 'install', 'youtube-dl'])
+    alias_cmd = "\nexport yt() { " + \
+        f"source {os.path.join(envpath, 'bin', 'activate')}; " + \
+        f"python {os.path.join(base_dir, 'custom_modules', 'youtube.py')} $@; " + \
+        "deactivate }\n"
+    with open(profile_file, 'a') as profile:
+        profile.write(alias_cmd)
+
+    print(f"Alias 'yt' created. Please restart the terminal or source the profile file.")
+
