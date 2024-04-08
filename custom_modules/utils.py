@@ -1,4 +1,6 @@
+import subprocess
 import json
+import sys
 import os
 
 def get_base_dir():
@@ -27,5 +29,27 @@ def get_requirements(submodule=None, as_list=False):
     with open(req_file, 'r') as fp:
         return fp.readlines()
 
-    
+def create_cv_shortcut(envname: str='venv'):
+    shell = os.environ.get('SHELL', '')
+    if 'bash' in shell:
+        profile_file = os.path.expanduser('~/.bashrc')
+    elif 'zsh' in shell:
+        profile_file = os.path.expanduser('~/.zshrc')
+    else:
+        print("Unsupported shell. Manual alias setup required.")
+        return
+    base_dir = get_base_dir()
+    envpath = os.path.join(base_dir, envname)
+    subprocess.check_call([sys.executable, '-m', 'venv', envpath])
+    pip_executable = os.path.join(envpath, 'bin', 'pip')
+    req_file = get_requirements('computer_vision', as_list=False)
+    subprocess.check_call([pip_executable, 'install', '-r', req_file])
+    alias_cmd = "\nexport cv() { " + \
+        f"source {os.path.join(envpath, 'bin', 'activate')}; " + \
+        f"python {os.path.join(base_dir, 'custom_modules', 'computer_vision', 'cli.py')} $@; " + \
+        "deactivate }\n"
+    with open(profile_file, 'a') as profile:
+        profile.write(alias_cmd)
+
+    print(f"Alias 'cv' created. Please restart the terminal or source the profile file.")
 

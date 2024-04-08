@@ -3,31 +3,10 @@
     "modelDir": "models",
     "models": {
         "objectDetection": {
-            "yolov4": {
-                "config": "classifier.cfg",
-                "names": "classifier.names",
-                "weights": "classifier.weights"
-            }
+            "modelDir": "object_detection/yolov4"
         },
         "imageScaler": {
             "modelDir": "image_scaler"
         }
-    },
-    "face-detector": {
-        "caffe_file_path": "face_classification/res_ssd_300x300.caffemodel",
-        "prototxt_file_path": "face_classification/deploy.prototxt"
-    },
-    "face-classifier": {
-        "recognizer_file_path": "face_classification/recognizer.pickle",
-        "embeddings_file_path": "face_classification/openface_nn4.small2.v1.t7",
-        "encoder_file_path": "face_classification/encoder.pickle",
-        "caffe_file_path": "face_classification/res_ssd_300x300.caffemodel",
-        "prototxt_file_path": "face_classification/deploy.prototxt"
-    },
-    "object-detector": {
-        "directory": "yolov3"
-    },
-    "image-scaling": {
-        "model_dir": "image_scaling"
     }
 }

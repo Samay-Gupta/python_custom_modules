@@ -1,6 +1,7 @@
 #!/bin/bash
 
 DIR_TO_ADD=$PWD
+MODELS_ZIP_URL=https://github.com/Samay-Gupta/python_custom_modules/releases/download/computer_vision_models/models.zip
 
 if [ -f "$HOME/.zshrc" ]; then
     echo "export PYTHONPATH=\"\${PYTHONPATH}:${DIR_TO_ADD}\"" >> $HOME/.zshrc
@@ -15,6 +16,7 @@ fi
 if [ -d "$DIR_TO_ADD" ]; then
     cd "$DIR_TO_ADD"
     cd "storage"
+    wget $MODELS_ZIP_URL
     
     if [ -f "models.zip" ]; then
         unzip models.zip

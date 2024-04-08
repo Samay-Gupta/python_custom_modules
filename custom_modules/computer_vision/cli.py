@@ -1,11 +1,13 @@
-from ..utils import get_default_config, get_base_dir, get_requirements
+from custom_modules.utils import get_default_config
 
-from .utils import load_image, save_image
+from custom_modules.computer_vision.utils import load_image, save_image
 
 import argparse
 import json
 import sys
 import os
+
+INVALID_MODE_ERROR = "    [ERROR] Invalid Mode"
 
 INVALID_USAGE_ERROR = "    [ERROR] Invalid Usage"
 
@@ -53,6 +55,14 @@ OCR_USAGE_TEXT = """
         - 'threshold': Applies binary thresholding with Otsu's method.
 """
 
+CLASSIFY_USAGE_TEXT = """
+    [USAGE] cv classify <image_path> <output>
+
+    image_path: The path to the image file from which text needs to be extracted.
+
+    output: The path to the output image file.
+"""
+
 class ComputerVisionCLI:
     def __init__(self, config) -> None:
         """
@@ -67,46 +77,61 @@ class ComputerVisionCLI:
     def run(self):
         args = self.get_args()
         if args["mode"] == "classify":
-            pass
+            from custom_modules.computer_vision.object_detection import ObjectDetector
+            model_dir = os.path.join(
+                self.model_dir, 
+                self.config["models"]["objectDetection"]["modelDir"]
+            )
+            clf = ObjectDetector(model_dir)
+            if args["live"]:
+                clf.classify_from_camera()
+            else:
+                image = load_image(args["source"])
+                output = clf.classify_and_draw(image)
+                save_image(output, args["output"])
         if args["mode"] == "read":
+            from custom_modules.computer_vision.ocr import TextRecognizer
             image = load_image(args["source"])
             text = TextRecognizer.from_image(image, args["preprocess"])
             print(text)
         if args["mode"] == "scale":
+            from custom_modules.computer_vision.image_scaler import ImageScaler
             model_dir = os.path.join(
                 self.model_dir, 
-                "image_scaler"
+                self.config["models"]["imageScaler"]["modelDir"]
             )
             image_scaler = ImageScaler(model_dir, args["scale"])
             image = load_image(args["source"])
             scaled_image = image_scaler.scale(image)
             save_image(scaled_image, args["output"])
         if args["mode"] == "scan":
+            from custom_modules.computer_vision.code_scanners import CodeScanner
             image = load_image(args["source"])
             text = CodeScanner.scan(image, args["code_type"])
             print(text)
 
     def get_args(self):
         if len(sys.argv) < 2:
-            print(sys.argv)
-            print("[ERROR] Required mode")
+            print(INVALID_MODE_ERROR)
+            print(TOOL_USAGE_TEXT)
             sys.exit(1)
         filename, mode, *arg_list = sys.argv
         argc = len(arg_list)
         args = { "mode": mode }
         if mode == "classify":
-            ap = argparse.ArgumentParser()
-            ap.add_argument('-src', '--source', type=str, default=None,
-                help="Set input source")
-            ap.add_argument('-l', '--live', action='store_true', default=False,
-                help="Use video as source")
-            ap.add_argument('-m', '--model', default='all', choices=['face', 'object', 'all'],
-                help="Classifier list")
-            args = vars(ap.parse_args(arg_list))
-            args["live"] = args["source"] is None
+            if argc > 2:
+                print(INVALID_USAGE_ERROR)
+                print(CLASSIFY_USAGE_TEXT)
+                sys.exit(1)
+            args["live"] = argc == 0
+            if argc > 0:
+                args["source"] = arg_list[0]
+                args["output"] = "output.png"
+                args["live"] = False
+            if argc > 1:
+                args["output"] = arg_list[1]
             return args
         if mode == "read":
-            from .ocr import TextRecognizer
             if not (1 <= argc <= 2):
                 print(INVALID_USAGE_ERROR)
                 print(OCR_USAGE_TEXT)
@@ -117,7 +142,6 @@ class ComputerVisionCLI:
                 args["preprocess"] = arg_list[1]
             return args
         if mode == "scale":
-            from .image_scaler import ImageScaler
             if not (1 <= argc <= 3):
                 print(INVALID_USAGE_ERROR)
                 print(SCALE_USAGE_TEXT)
@@ -129,7 +153,6 @@ class ComputerVisionCLI:
                 args["scale"] = int(arg_list[1])
             return args
         if mode == "scan":
-            from .code_scanners import CodeScanner
             if not (1 <= argc <= 2):
                 print(INVALID_USAGE_ERROR)
                 print(SCAN_USAGE_TEXT)
@@ -140,7 +163,7 @@ class ComputerVisionCLI:
                 args["code_type"] = arg_list[1]
             return args
         print(INVALID_USAGE_ERROR)
-        print(f"[USAGE] python3 {filename} <mode> <args>")
+        print(TOOL_USAGE_TEXT)
         sys.exit(1)
     
     @staticmethod
@@ -151,30 +174,6 @@ class ComputerVisionCLI:
             with open(config_path, 'r') as fp:
                 config = json.load(fp)
         return ComputerVisionCLI(config)
-
-def add_to_terminal(envname: str='venv'):
-    shell = os.environ.get('SHELL', '')
-    if 'bash' in shell:
-        profile_file = os.path.expanduser('~/.bashrc')
-    elif 'zsh' in shell:
-        profile_file = os.path.expanduser('~/.zshrc')
-    else:
-        print("Unsupported shell. Manual alias setup required.")
-        return
-    base_dir = get_base_dir()
-    subprocess.check_call([sys.executable, '-m', 'venv', envname])
-    pip_executable = os.path.join(base_dir, envname, 'bin', 'pip')
-    req_file = get_requirements('computer_vision', as_list=False)
-    subprocess.check_call([pip_executable, 'install', '-r', req_file])
-    alias_cmd = "\nexport cv() {" + \
-        f"source {os.path.join(base_dir, envname, 'bin', 'activate')} && " + \
-        f"python {os.path.join(base_dir, 'custom_modules', 'computer_vision', 'cli.py')} $@ && " + \
-        "deactivate }\n"
-    with open(profile_file, 'a') as profile:
-        profile.write(alias_cmd)
-
-    print(f"Alias 'cv' created. Please restart the terminal or source the profile file.")
-
 
 if __name__ == '__main__':
     config = get_default_config()
