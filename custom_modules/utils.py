@@ -47,7 +47,7 @@ def create_cv_shortcut(envname: str='venv'):
     alias_cmd = "\nexport cv() { " + \
         f"source {os.path.join(envpath, 'bin', 'activate')}; " + \
         f"python {os.path.join(base_dir, 'custom_modules', 'computer_vision', 'cli.py')} $@; " + \
-        "deactivate }\n"
+        "deactivate }"
     with open(profile_file, 'a') as profile:
         profile.write(alias_cmd)
 
@@ -70,7 +70,7 @@ def create_yt_shortcut(envname: str='venv'):
     alias_cmd = "\nexport yt() { " + \
         f"source {os.path.join(envpath, 'bin', 'activate')}; " + \
         f"python {os.path.join(base_dir, 'custom_modules', 'youtube.py')} $@; " + \
-        "deactivate }\n"
+        "deactivate }"
     with open(profile_file, 'a') as profile:
         profile.write(alias_cmd)
 
@@ -93,7 +93,7 @@ def create_transcribe_shortcut(envname: str='venv'):
     alias_cmd = "\nexport transcribe() { " + \
         f"source {os.path.join(envpath, 'bin', 'activate')}; " + \
         f"python {os.path.join(base_dir, 'custom_modules', 'transcriber.py')} $@; " + \
-        "deactivate }\n"
+        "deactivate }"
     with open(profile_file, 'a') as profile:
         profile.write(alias_cmd)
 
