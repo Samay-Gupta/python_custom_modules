@@ -1,0 +1,11 @@
+opencv-contrib-python
+numpy
+
+pytesseract
+
+pyzbar
+qrcode
+python-barcode
+
+scikit-learn
+imutils
