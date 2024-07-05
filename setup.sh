@@ -27,3 +27,11 @@ if [ -d "$DIR_TO_ADD" ]; then
 else
     echo "$DIR_TO_ADD does not exist."
 fi
+
+python3 -m venv venv
+source venv/bin/activate
+cd custom_modules
+python -m pip install -r requirements.txt
+cd ..
+deactivate
+

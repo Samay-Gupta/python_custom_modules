@@ -7,60 +7,60 @@ import json
 import sys
 import os
 
-INVALID_MODE_ERROR = "    [ERROR] Invalid Mode"
+INVALID_MODE_ERROR = "[ERROR] Invalid Mode"
 
-INVALID_USAGE_ERROR = "    [ERROR] Invalid Usage"
+INVALID_USAGE_ERROR = "[ERROR] Invalid Usage"
 
 TOOL_USAGE_TEXT = """
-    [USAGE] cv <mode> <args>
+[USAGE] cv <mode> <args>
 
-    mode: The operation mode to be performed.
-        - 'classify': Classify objects in an image.
-        - 'read': Extract text from an image.
-        - 'scale': Scale an image by a factor of 2, 3, or 4.
-        - 'scan': Read QR and barcodes from an image.
+mode: The operation mode to be performed.
+    - 'classify': Classify objects in an image.
+    - 'read': Extract text from an image.
+    - 'scale': Scale an image by a factor of 2, 3, or 4.
+    - 'scan': Read QR and barcodes from an image.
         
 """
 
 SCAN_USAGE_TEXT = """
-    [USAGE] cv scan <image_path> <code_type>
+[USAGE] cv scan <image_path> <code_type>
 
-    image_path: The path to the image file from which QR and barcodes need to be extracted.
+image_path: The path to the image file from which QR and barcodes need to be extracted.
 
-    code_type: The type of code to be scanned.
-        - 'qr': Scan QR codes. [default]
-        - 'barcode': Scan barcodes.
+code_type: The type of code to be scanned.
+    - 'qr': Scan QR codes. [default]
+    - 'barcode': Scan barcodes.
 """
 
 SCALE_USAGE_TEXT = """
-    [USAGE] cv read <image_path> <scale> <output>
+[USAGE] cv read <image_path> <scale> <output>
 
-    image_path: The path to the image file from which text needs to be extracted.
+image_path: The path to the image file from which text needs to be extracted.
 
-    scale: scale factor to resize the image.
-        - Allowed values: 2, 3, 4
-        - Default value: 2
+scale: scale factor to resize the image.
+    - Allowed values: 2, 3, 4
+    - Default value: 2
 
-    output: The path to the output image file.
-        - Default value: output.png
+output: The path to the output image file.
+    - Default value: output.png
 """
 
 OCR_USAGE_TEXT = """
-    [USAGE] cv read <image_path> <preprocess>
+[USAGE] cv read <image_path> <preprocess>
 
-    image_path: The path to the image file from which text needs to be extracted.
+image_path: The path to the image file from which text needs to be extracted.
 
-    preprocess: The preprocessing mode to be applied to the image before OCR.
-        - 'blur': Applies median blur to the image. [default]
-        - 'threshold': Applies binary thresholding with Otsu's method.
+preprocess: The preprocessing mode to be applied to the image before OCR.
+    - 'blur': Applies median blur to the image. [default]
+    - 'threshold': Applies binary thresholding with Otsu's method.
 """
 
 CLASSIFY_USAGE_TEXT = """
-    [USAGE] cv classify <image_path> <output>
+[USAGE] cv classify <image_path> <output>
 
-    image_path: The path to the image file from which text needs to be extracted.
+image_path: The path to the image file from which text needs to be extracted.
 
-    output: The path to the output image file.
+output: The path to the output image file.
 """
 
 class ComputerVisionCLI:
